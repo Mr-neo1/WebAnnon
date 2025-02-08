@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -22,6 +22,11 @@ io.on("connection", (socket) => {
   // Listen for chat messages from the client
   socket.on("chatMessage", (data) => {
     ChatController.handleChatMessage(socket, io, data);
+  });
+
+  // Listen for a request to find a new partner
+  socket.on("search", () => {
+    ChatController.searchForNewPartner(socket, io);
   });
 
   // Optionally, handle additional events (for example, WebRTC signaling)
