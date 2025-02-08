@@ -51,6 +51,19 @@ class ChatController {
       socket.emit("message", "No matched peer found.");
     }
   }
+
+  static async searchForNewPartner(socket, io) {
+    // If already matched, remove the current match.
+    const currentMatch = matchedPeers.get(socket.id);
+    if (currentMatch) {
+      matchedPeers.delete(socket.id);
+      matchedPeers.delete(currentMatch);
+      io.to(currentMatch).emit("message", "Your peer has left. Searching for a new partner...");
+      socket.emit("message", "Searching for a new partner...");
+    }
+    // Add the socket back into matching process.
+    await ChatController.handleConnection(socket, io);
+  }
 }
 
 module.exports = ChatController;
